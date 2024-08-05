@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Desafio1DSML</string>
+    <string name="calculadora">Calculadora</string>
+    <string name="calcular_descuentos_salario">Calcular Descuentos Salario</string>
+    <string name="calcular_promedio">Calcular Promedio</string>
+    <string name="men_principal">Menú Principal</string>
+</resources>

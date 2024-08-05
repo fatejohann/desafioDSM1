@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/etNombreEmpleado"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nombre del Empleado" />
+
+    <EditText
+        android:id="@+id/etSalarioBase"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Salario Base"
+        android:inputType="numberDecimal" />
+
+    <Button
+        android:id="@+id/btnCalcularSalario"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Calcular Descuentos" />
+
+    <TextView
+        android:id="@+id/tvResultadoSalario"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Resultado"
+        android:visibility="gone" />
+</LinearLayout>
