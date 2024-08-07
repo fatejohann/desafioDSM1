@@ -1,54 +1,75 @@
 package edu.udb.desafio1dsml
 
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
 class CalculadoraActivity : AppCompatActivity() {
 
-    private lateinit var etOperando1: EditText
-    private lateinit var etOperando2: EditText
-    private lateinit var etOperacion: EditText
-    private lateinit var btnCalcularOperacion: Button
-    private lateinit var tvResultadoOperacion: TextView
+    private lateinit var etDisplay: EditText
+    private var operand1: Float? = null
+    private var operand2: Float? = null
+    private var operator: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_calculadora)
 
-        etOperando1 = findViewById(R.id.etOperando1)
-        etOperando2 = findViewById(R.id.etOperando2)
-        etOperacion = findViewById(R.id.etOperacion)
-        btnCalcularOperacion = findViewById(R.id.btnCalcularOperacion)
-        tvResultadoOperacion = findViewById(R.id.tvResultadoOperacion)
+        etDisplay = findViewById(R.id.etDisplay)
 
-        btnCalcularOperacion.setOnClickListener {
-            calcularOperacion()
-        }
-    }
-
-    private fun calcularOperacion() {
-        val operando1 = etOperando1.text.toString().toFloatOrNull()
-        val operando2 = etOperando2.text.toString().toFloatOrNull()
-        val operacion = etOperacion.text.toString()
-
-        if (operando1 == null || operando2 == null || operacion.isEmpty()) {
-            Toast.makeText(this, "Por favor, complete todos los campos correctamente.", Toast.LENGTH_SHORT).show()
-            return
+        val buttonClickListener = View.OnClickListener { view ->
+            val button = view as Button
+            etDisplay.append(button.text)
         }
 
-        val resultado = when (operacion) {
-            "+" -> operando1 + operando2
-            "-" -> operando1 - operando2
-            "*" -> operando1 * operando2
-            "/" -> if (operando2 != 0f) operando1 / operando2 else "Error: División por cero"
-            else -> "Operación inválida"
+        findViewById<Button>(R.id.btn0).setOnClickListener(buttonClickListener)
+        findViewById<Button>(R.id.btn1).setOnClickListener(buttonClickListener)
+        findViewById<Button>(R.id.btn2).setOnClickListener(buttonClickListener)
+        findViewById<Button>(R.id.btn3).setOnClickListener(buttonClickListener)
+        findViewById<Button>(R.id.btn4).setOnClickListener(buttonClickListener)
+        findViewById<Button>(R.id.btn5).setOnClickListener(buttonClickListener)
+        findViewById<Button>(R.id.btn6).setOnClickListener(buttonClickListener)
+        findViewById<Button>(R.id.btn7).setOnClickListener(buttonClickListener)
+        findViewById<Button>(R.id.btn8).setOnClickListener(buttonClickListener)
+        findViewById<Button>(R.id.btn9).setOnClickListener(buttonClickListener)
+        findViewById<Button>(R.id.btnComma).setOnClickListener(buttonClickListener)
+
+        findViewById<Button>(R.id.btnAdd).setOnClickListener {
+            operator = "+"
+            operand1 = etDisplay.text.toString().toFloatOrNull()
+            etDisplay.text.clear()
         }
 
-        tvResultadoOperacion.text = "Resultado: $resultado"
-        tvResultadoOperacion.visibility = TextView.VISIBLE
+        findViewById<Button>(R.id.btnSubtract).setOnClickListener {
+            operator = "-"
+            operand1 = etDisplay.text.toString().toFloatOrNull()
+            etDisplay.text.clear()
+        }
+
+        findViewById<Button>(R.id.btnMultiply).setOnClickListener {
+            operator = "*"
+            operand1 = etDisplay.text.toString().toFloatOrNull()
+            etDisplay.text.clear()
+        }
+
+        findViewById<Button>(R.id.btnDivide).setOnClickListener {
+            operator = "/"
+            operand1 = etDisplay.text.toString().toFloatOrNull()
+            etDisplay.text.clear()
+        }
+
+        findViewById<Button>(R.id.btnEqual).setOnClickListener {
+            operand2 = etDisplay.text.toString().toFloatOrNull()
+            val result = when (operator) {
+                "+" -> operand1!! + operand2!!
+                "-" -> operand1!! - operand2!!
+                "*" -> operand1!! * operand2!!
+                "/" -> if (operand2 != 0f) operand1!! / operand2!! else "Error: División por cero"
+                else -> "Operación inválida"
+            }
+            etDisplay.setText(result.toString())
+        }
     }
 }
