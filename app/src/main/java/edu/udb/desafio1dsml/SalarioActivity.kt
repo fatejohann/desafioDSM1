@@ -6,6 +6,7 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import kotlin.text.*
 
 class SalarioActivity : AppCompatActivity() {
 
@@ -23,9 +24,7 @@ class SalarioActivity : AppCompatActivity() {
         btnCalcularSalario = findViewById(R.id.btnCalcularSalario)
         tvResultadoSalario = findViewById(R.id.tvResultadoSalario)
 
-        btnCalcularSalario.setOnClickListener {
-            calcularDescuentos()
-        }
+        btnCalcularSalario.setOnClickListener { calcularDescuentos() }
     }
 
     private fun calcularDescuentos() {
@@ -33,34 +32,55 @@ class SalarioActivity : AppCompatActivity() {
         val salarioBase = etSalarioBase.text.toString().toFloatOrNull()
 
         if (nombre.isEmpty() || salarioBase == null) {
-            Toast.makeText(this, "Por favor, complete todos los campos correctamente.", Toast.LENGTH_SHORT).show()
+            mostrarMensaje("Por favor, complete todos los campos correctamente.")
             return
         }
 
-        val afp = salarioBase * 0.0725
-        val isss = salarioBase * 0.03
+        val afp = calcularAfp(salarioBase)
+        val isss = calcularIsss(salarioBase)
         val renta = calcularRenta(salarioBase)
         val salarioNeto = salarioBase - afp - isss - renta
 
+        mostrarResultado(nombre, salarioBase, afp, isss, renta, salarioNeto)
+    }
+
+    private fun calcularAfp(salarioBase: Float): Float {
+        return formatDecimal(salarioBase * 0.0725f)
+    }
+
+    private fun calcularIsss(salarioBase: Float): Float {
+        return formatDecimal(salarioBase * 0.03f)
+    }
+
+    private fun calcularRenta(salarioBase: Float): Float {
+        val renta = when {
+            salarioBase <= 472.0 -> 0f
+            salarioBase <= 895.24 -> ((salarioBase - 472.0) * 0.1f + 17.67f)
+            salarioBase <= 2038.10 -> ((salarioBase - 895.24) * 0.2f + 60.0f)
+            else -> ((salarioBase - 2038.10) * 0.3f + 288.57f)
+        }
+        return formatDecimal(renta)
+    }
+
+    private fun formatDecimal(number: Number): Float {
+        return String.format("%.1f", number).toFloat()
+    }
+
+    private fun mostrarMensaje(mensaje: String) {
+        Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun mostrarResultado(nombre: String, salarioBase: Float, afp: Float, isss: Float, renta: Float, salarioNeto: Float) {
         val resultado = """
             Nombre: $nombre
-            Salario Base: $salarioBase
-            AFP: $afp
-            ISSS: $isss
-            Renta: $renta
-            Salario Neto: $salarioNeto
+            Salario Base: ${formatDecimal(salarioBase)}
+            AFP: ${formatDecimal(afp)}
+            ISSS: ${formatDecimal(isss)}
+            Renta: ${formatDecimal(renta)}
+            Salario Neto: ${formatDecimal(salarioNeto)}
         """.trimIndent()
 
         tvResultadoSalario.text = resultado
         tvResultadoSalario.visibility = TextView.VISIBLE
-    }
-
-    private fun calcularRenta(salarioBase: Float): Float {
-        return when {
-            salarioBase <= 472.0 -> 0f
-            salarioBase <= 895.24 -> ((salarioBase - 472.0) * 0.1f + 17.67f).toFloat()
-            salarioBase <= 2038.10 -> ((salarioBase - 895.24) * 0.2f + 60.0f).toFloat()
-            else -> ((salarioBase - 2038.10) * 0.3f + 288.57f).toFloat()
-        }
     }
 }
