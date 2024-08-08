@@ -5,13 +5,16 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 class CalculadoraActivity : AppCompatActivity() {
 
     private lateinit var etDisplay: EditText
-    private var operand1: Float? = null
-    private var operand2: Float? = null
+    private var operand1: BigDecimal? = null
+    private var operand2: BigDecimal? = null
     private var operator: String? = null
+    private var clearNext: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,6 +24,10 @@ class CalculadoraActivity : AppCompatActivity() {
 
         val buttonClickListener = View.OnClickListener { view ->
             val button = view as Button
+            if (clearNext) {
+                etDisplay.text.clear()
+                clearNext = false
+            }
             etDisplay.append(button.text)
         }
 
@@ -37,39 +44,52 @@ class CalculadoraActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnComma).setOnClickListener(buttonClickListener)
 
         findViewById<Button>(R.id.btnAdd).setOnClickListener {
-            operator = "+"
-            operand1 = etDisplay.text.toString().toFloatOrNull()
-            etDisplay.text.clear()
+            setOperator("+")
         }
 
         findViewById<Button>(R.id.btnSubtract).setOnClickListener {
-            operator = "-"
-            operand1 = etDisplay.text.toString().toFloatOrNull()
-            etDisplay.text.clear()
+            setOperator("-")
         }
 
         findViewById<Button>(R.id.btnMultiply).setOnClickListener {
-            operator = "*"
-            operand1 = etDisplay.text.toString().toFloatOrNull()
-            etDisplay.text.clear()
+            setOperator("*")
         }
 
         findViewById<Button>(R.id.btnDivide).setOnClickListener {
-            operator = "/"
-            operand1 = etDisplay.text.toString().toFloatOrNull()
-            etDisplay.text.clear()
+            setOperator("/")
         }
 
         findViewById<Button>(R.id.btnEqual).setOnClickListener {
-            operand2 = etDisplay.text.toString().toFloatOrNull()
-            val result = when (operator) {
-                "+" -> operand1!! + operand2!!
-                "-" -> operand1!! - operand2!!
-                "*" -> operand1!! * operand2!!
-                "/" -> if (operand2 != 0f) operand1!! / operand2!! else "Error: División por cero"
-                else -> "Operación inválida"
-            }
-            etDisplay.setText(result.toString())
+            operand2 = etDisplay.text.toString().replace(",", ".").toBigDecimalOrNull()
+            val result = calculateResult()
+            etDisplay.setText(result)
+            operator = null
+            clearNext = true
         }
+    }
+
+    private fun setOperator(op: String) {
+        operator = op
+        operand1 = etDisplay.text.toString().replace(",", ".").toBigDecimalOrNull()
+        clearNext = true
+    }
+
+    private fun calculateResult(): String {
+        return if (operand1 == null || operand2 == null || operator == null) {
+            "Error: Operación inválida"
+        } else {
+            val result = when (operator) {
+                "+" -> operand1!!.add(operand2!!)
+                "-" -> operand1!!.subtract(operand2!!)
+                "*" -> operand1!!.multiply(operand2!!)
+                "/" -> if (operand2 != BigDecimal.ZERO) operand1!!.divide(operand2!!, 10, RoundingMode.HALF_UP) else return "Error: División por cero"
+                else -> return "Error: Operación inválida"
+            }
+            formatResult(result)
+        }
+    }
+
+    private fun formatResult(result: BigDecimal): String {
+        return result.setScale(2, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString()
     }
 }
